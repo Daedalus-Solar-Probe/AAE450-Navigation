@@ -1,4 +1,4 @@
-function [x_ecl,y_ecl,z_ecl,x_icrf,y_icrf,z_icrf] = ephemeris(T_eph)
+function [x,y,z,vx,vy,vz] = ephemeris(T_eph,useICRF)
 % EPHEMERIS Provides cartesian positions of all 8 planets relative to the
 % sun in either J2000 Ecliptic or ICRF reference frames. Implemented to be
 % vectorized as much as possible and therefore very fast as compared to the
@@ -33,6 +33,10 @@ function [x_ecl,y_ecl,z_ecl,x_icrf,y_icrf,z_icrf] = ephemeris(T_eph)
 %
 % Data Source:
 %   https://ssd.jpl.nasa.gov/planets/approx_pos.html
+
+if nargin < 2
+    useICRF = false;
+end
 
 % objects
 objects = [
@@ -285,20 +289,37 @@ end
 x_orbit = a.*(cos(E)-e); % [au]
 y_orbit = a.*sqrt(1-e.^2).*sin(E); % [au]
 
+
 % heliocentric coodinates in J2000 Ecliptic Plane
-x_ecl = (cos(omega).*cos(OMEGA)-sin(omega).*sin(OMEGA).*cos(I)).*x_orbit + ...
+x = (cos(omega).*cos(OMEGA)-sin(omega).*sin(OMEGA).*cos(I)).*x_orbit + ...
     (-sin(omega).*cos(OMEGA)-cos(omega).*sin(OMEGA).*cos(I)).*y_orbit;
 
-y_ecl = (cos(omega).*sin(OMEGA)+sin(omega).*cos(OMEGA).*cos(I)).*x_orbit + ...
+y = (cos(omega).*sin(OMEGA)+sin(omega).*cos(OMEGA).*cos(I)).*x_orbit + ...
     (-sin(omega).*sin(OMEGA)+cos(omega).*cos(OMEGA).*cos(I)).*y_orbit;
 
-z_ecl = sin(omega).*sin(I).*x_orbit + cos(omega).*sin(I).*y_orbit;
+z = sin(omega).*sin(I).*x_orbit + cos(omega).*sin(I).*y_orbit;
+
+% velocity
+mu = 2.959e-04;
+Rc = a.*(1-e.*cos(E));
+
+vx_orbit = -sqrt(mu*a)./Rc.*sin(E);
+vy_orbit = sqrt(mu*a)./Rc.*sqrt(1-e.^2).*cos(E);
+
+vx = (cos(omega).*cos(OMEGA)-sin(omega).*sin(OMEGA).*cos(I)).*vx_orbit + ...
+    (-sin(omega).*cos(OMEGA)-cos(omega).*sin(OMEGA).*cos(I)).*vy_orbit;
+
+vy = (cos(omega).*sin(OMEGA)+sin(omega).*cos(OMEGA).*cos(I)).*vx_orbit + ...
+    (-sin(omega).*sin(OMEGA)+cos(omega).*cos(OMEGA).*cos(I)).*vy_orbit;
+
+vz = sin(omega).*sin(I).*vx_orbit + cos(omega).*sin(I).*vy_orbit;
 
 % if user want the coordinates in J2000 ICRF
-if nargout > 3
-    % obliquity at J2000
-    epsilon = deg2rad(23.43928);
-    x_icrf = x_ecl;
-    y_icrf = cos(epsilon)*y_ecl - sin(epsilon)*z_ecl;
-    z_icrf = sin(epsilon)*y_ecl + cos(epsilon)*z_ecl;
+if useICRF
+    epsilon = deg2rad(23.43928); % [deg] obliquity at J2000
+    y = cos(epsilon)*y - sin(epsilon)*z;
+    z = sin(epsilon)*y + cos(epsilon)*z;
+    
+    vy = cos(epsilon)*vy - sin(epsilon)*vz;
+    vz = sin(epsilon)*vy + cos(epsilon)*vz;
 end
