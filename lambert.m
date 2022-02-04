@@ -27,7 +27,7 @@
 %     tf        [days]    time of flight to solve for
 %      m          [-]     specifies the number of complete orbits to complete
 %                         (should be an integer)
-% GM_central   [km3/s2]   std. grav. parameter (G�M = mu) of the central body
+% GM_central   [km3/s2]   std. grav. parameter (GM = mu) of the central body
 %
 % OUTPUT ARGUMENTS:
 % ======================================================================
