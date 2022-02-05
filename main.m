@@ -12,21 +12,21 @@ mu = 1.3271e+11; % [km^3/s^2]
 bd = 'Earth';
 
 % arrival body
-ba = 'Venus';
+ba = 'Jupiter';
 
 % launch window
 launch_0 = juliandate(datetime(2028,0,0)); % [JD]
 launch_f = juliandate(datetime(2032,0,0)); % [JD]
 
 % time of flight (Hohman transfer time of ~260 days)
-tof_0 = 25; % [days]
-tof_f = 600; % [days]
+tof_0 = 200; % [days]
+tof_f = 2500; % [days]
 
 % mesh size
-M = 500;
-N = 500;
+M = 1000;
+N = 1000;
 
-cutoff = 10; % [km/s]
+cutoff = 20; % [km/s]
 
 % time spans
 launch = linspace(launch_0,launch_f,M);

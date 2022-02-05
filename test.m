@@ -4,120 +4,54 @@ clc
 
 %%
 
-start = juliandate(datetime);
-stop = start + 365.25;
+launch = juliandate(datetime(2028,0,0)); % [JD]
 
-T_eph = linspace(start,stop,1000);
+[Re_tru,Ve_tru] = planetEphemeris(launch,'Sun','Earth');
 
-r_ecl = zeros(3,8,length(T_eph));
-r_icrf = zeros(size(r_ecl));
+[x,y,z,vx,vy,vz] = ephemeris_state(launch,true);
+Re = [x(3) y(3) z(3)]*149597870.691;
+Ve = [vx(3) vy(3) vz(3)]*149597870.691;
 
-% tic
-% for i = 1:length(T_eph)
-%     [r_ecl(:,:,i),r_icrf(:,:,i)] = ephemeris(T_eph(i));
-% end
-% toc
+abs(Re_tru-Re)./Re_tru*100;
+
+Ve_tru
+Ve
+
+%%
+
+N = 400;
+start = juliandate(datetime(2000,0,0));
+stop = juliandate(datetime(2050,0,0));
+
+tspan = linspace(start,stop,N);
 
 tic
-[x_ecl,y_ecl,z_ecl,x_icrf,y_icrf,z_icrf] = ephemeris(T_eph);
+[R,V] = planetEphemeris(tspan','Sun','Mercury');
 toc
 
-%% Plot J2000 Ecliptic
-
-r_mercury = [x_icrf(1,:); y_icrf(1,:); z_icrf(1,:)];
-r_venus = [x_icrf(2,:); y_icrf(2,:); z_icrf(2,:)];
-r_earth = [x_icrf(3,:); y_icrf(3,:); z_icrf(3,:)];
-r_mars = [x_icrf(4,:); y_icrf(4,:); z_icrf(4,:)];
+%%
 
 figure(1)
-plot3(0,0,0,'ko','MarkerSize',20,'MarkerFaceColor','y')
-hold on
+plot3(R(:,1),R(:,2),R(:,3))
 
-plot3(r_mercury(1,:),r_mercury(2,:),r_mercury(3,:),'k')
-plot3(r_venus(1,:),r_venus(2,:),r_venus(3,:),'g')
-plot3(r_earth(1,:),r_earth(2,:),r_earth(3,:),'b')
-plot3(r_mars(1,:),r_mars(2,:),r_mars(3,:),'r')
-hold off
+figure(2)
 
-grid on
-xlim([-1.5 1.5])
-ylim([-1.5 1.5])
-zlim([-1.5 1.5])
+t = linspace(start,start + 100,N^2);
+r = interp1(tspan,R,t);
+
+plot3(r(:,1),r(:,2),r(:,3))
 
 
-% %% J2000 Ecliptic
-% 
-% r_mercury = reshape(r_ecl(:,1,:),3,[]);
-% r_venus = reshape(r_ecl(:,2,:),3,[]);
-% r_earth = reshape(r_ecl(:,3,:),3,[]);
-% r_mars = reshape(r_ecl(:,4,:),3,[]);
-% 
-% figure(1)
-% plot3(0,0,0,'ko','MarkerSize',20,'MarkerFaceColor','y')
-% hold on
-% 
-% plot3(r_mercury(1,:),r_mercury(2,:),r_mercury(3,:),'r')
-% plot3(r_venus(1,:),r_venus(2,:),r_venus(3,:),'r')
-% plot3(r_earth(1,:),r_earth(2,:),r_earth(3,:),'r')
-% plot3(r_mars(1,:),r_mars(2,:),r_mars(3,:),'r')
-% hold off
-% 
-% grid on
-% xlim([-1.5 1.5])
-% ylim([-1.5 1.5])
-% zlim([-1.5 1.5])
-% 
-% %% J2000 ICRF
-% 
-% r_mercury = reshape(r_icrf(:,1,:),3,[]);
-% r_venus = reshape(r_icrf(:,2,:),3,[]);
-% r_earth = reshape(r_icrf(:,3,:),3,[]);
-% r_mars = reshape(r_icrf(:,4,:),3,[]);
-% 
-% figure(2)
-% plot3(0,0,0,'ko','MarkerSize',20,'MarkerFaceColor','y')
-% hold on
-% 
-% plot3(r_mercury(1,:),r_mercury(2,:),r_mercury(3,:),'r')
-% plot3(r_venus(1,:),r_venus(2,:),r_venus(3,:),'r')
-% plot3(r_earth(1,:),r_earth(2,:),r_earth(3,:),'r')
-% plot3(r_mars(1,:),r_mars(2,:),r_mars(3,:),'r')
-% hold off
-% 
-% grid on
-% xlim([-1.5 1.5])
-% ylim([-1.5 1.5])
-% zlim([-1.5 1.5])
-% 
-% 
-% %% MATLAB Ephemeris
-% 
-% figure(3)
-% 
-% r_mercury1 = planetEphemeris(T_eph','Sun','Mercury','405','AU')';
-% r_venus1 = planetEphemeris(T_eph','Sun','Venus','405','AU')';
-% r_earth1 = planetEphemeris(T_eph','Sun','Earth','405','AU')';
-% r_mars1 = planetEphemeris(T_eph','Sun','mars','405','AU')';
-% 
-% figure(3)
-% plot3(0,0,0,'ko','MarkerSize',20,'MarkerFaceColor','y')
-% hold on
-% 
-% plot3(r_mercury1(1,:),r_mercury1(2,:),r_mercury1(3,:),'r')
-% plot3(r_venus1(1,:),r_venus1(2,:),r_venus1(3,:),'r')
-% plot3(r_earth1(1,:),r_earth1(2,:),r_earth1(3,:),'r')
-% plot3(r_mars1(1,:),r_mars1(2,:),r_mars1(3,:),'r')
-% hold off
-% 
-% grid on
-% xlim([-1.5 1.5])
-% ylim([-1.5 1.5])
-% zlim([-1.5 1.5])
-% 
-% 
-% %% difference
-% 
-% r_mercury1 - r_mercury1
-% 
-% 
-% % r = coes2svec(a(1),e(1),omega(1),OMEGA(1),I(1),M(1),0,3.986004418e5)
+%%
+
+clear
+clc
+
+tic
+[R,V] = planetEphemeris(2451545.0,'Sun','Mercury','405','AU');
+toc
+
+[x,y,z,vx,vy,vz] = ephemeris(2451545.0,true);
+
+r = [x(1) y(1) z(1)];
+v = [vx(1) vy(1) vz(1)];
