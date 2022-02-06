@@ -1,6 +1,9 @@
 # Project Data Folder
 data/*
 
+# Testing script
+test.m
+
 # Windows default autosave extension
 *.asv
 
