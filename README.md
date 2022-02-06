@@ -1,2 +1,6 @@
 # AAE450 Navigation
-## Github repo in case I need to share code
+## Requirements:
+- MATLAB (built using R2021b)
+- Aerospace Toolbox
+- Ephemeris Data for Aerospace Toolbox
+- Parallel Computing Toolbox (maybe)
