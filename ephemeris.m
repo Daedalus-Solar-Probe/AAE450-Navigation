@@ -1,4 +1,4 @@
-function [x,y,z,vx,vy,vz] = ephemeris(T_eph,useICRF)
+function [R,V] = ephemeris(T_eph,useICRF)
 % EPHEMERIS Provides cartesian positions of all 8 planets relative to the
 % sun in either J2000 Ecliptic or ICRF reference frames. Implemented to be
 % vectorized as much as possible and therefore very fast as compared to the
@@ -8,28 +8,36 @@ function [x,y,z,vx,vy,vz] = ephemeris(T_eph,useICRF)
 %   T_eph: row vector containing ephemeris times to be evaluated at in
 %       Julian Days (see MATLAB Aerosapce toolbox function "juliandate"
 %
+%   useICRF: boolean controlling the output frame of the data. By default
+%       it returns everything in the J2000 Ecliptic system but when useICRF
+%       is true, it uses the J2000 ICRF.
+%
 % Outputs:
-%   x_ecl: 8x(len(T_eph)) containing the series of x coordinate location
-%       relative to the J2000 Mean Ecliptic Frame for planets in
-%       increasing (Mercury, Venus, Earth, ...) order in AU.
+%   R: Matrix containing the positions of each planet at the desired
+%       ephemeris times. Order is ascending from sun outwards so Mercury,
+%       Venus, Earth... The shape of the vector is [3xNx8] where the first
+%       dimension contains the position vector, the second is the index of
+%       the ephemeris, and the last in the planetary index. Unites are in
+%       AU
 %
-%   y_ecl: ""
-%
-%   z_ecl: ""
-%
-%   x_icrf: 8x(len(T_eph)) containing the series of x coordinate location
-%       relative to the J2000 ICRF frame for planets in increasing 
-%       (Mercury, Venus, Earth, ...) order in AU.
+%   V: Same as R but with units of AU/day
 %
 % Information:
 %   Author: Matthew Mader
 %   Contact: maderm@purdue.edu
-%   Date: Feb 3, 2022
+%   Date: Feb 5, 2022
 %
 % Revision History:
 %   Rev: IR
+%   Date: 2/2/2022
 %   Notes: Initial release, conducted limited tests compared against to the
 %       "planetEphemeris" function in ICRF for inner planets.
+%
+%   Rev: A
+%   Date: 2/5/2022
+%   Notes: Added planetary velocities and changed the shape of the output
+%       variables. Velocities slightly diverge in the z-axis of the ICRF
+%       from limited testing on the inner planets.
 %
 % Data Source:
 %   https://ssd.jpl.nasa.gov/planets/approx_pos.html
@@ -300,11 +308,11 @@ y = (cos(omega).*sin(OMEGA)+sin(omega).*cos(OMEGA).*cos(I)).*x_orbit + ...
 z = sin(omega).*sin(I).*x_orbit + cos(omega).*sin(I).*y_orbit;
 
 % velocity
-mu = 2.959e-04;
-Rc = a.*(1-e.*cos(E));
+mu = 2.959e-04; % [au^3/day^2]
+Rc = a.*(1-e.*cos(E)); % [au]
 
-vx_orbit = -sqrt(mu*a)./Rc.*sin(E);
-vy_orbit = sqrt(mu*a)./Rc.*sqrt(1-e.^2).*cos(E);
+vx_orbit = -sqrt(mu*a)./Rc.*sin(E); % [au/day]
+vy_orbit = sqrt(mu*a)./Rc.*sqrt(1-e.^2).*cos(E); % [au/day]
 
 vx = (cos(omega).*cos(OMEGA)-sin(omega).*sin(OMEGA).*cos(I)).*vx_orbit + ...
     (-sin(omega).*cos(OMEGA)-cos(omega).*sin(OMEGA).*cos(I)).*vy_orbit;
@@ -317,9 +325,21 @@ vz = sin(omega).*sin(I).*vx_orbit + cos(omega).*sin(I).*vy_orbit;
 % if user want the coordinates in J2000 ICRF
 if useICRF
     epsilon = deg2rad(23.43928); % [deg] obliquity at J2000
-    y = cos(epsilon)*y - sin(epsilon)*z;
-    z = sin(epsilon)*y + cos(epsilon)*z;
+    y = cos(epsilon)*y - sin(epsilon)*z; % [au]
+    z = sin(epsilon)*y + cos(epsilon)*z; % [au]
     
-    vy = cos(epsilon)*vy - sin(epsilon)*vz;
-    vz = sin(epsilon)*vy + cos(epsilon)*vz;
+    vy = cos(epsilon)*vy - sin(epsilon)*vz; % [au/day]
+    vz = sin(epsilon)*vy + cos(epsilon)*vz; % [au/day]
 end
+
+% combine x,y,z vectors
+R = [x; y; z]; % [au]
+V = [vx; vy; vz]; % [au/day]
+
+% restructure the data into proper vectors
+R = reshape(R,8,3,[]); % [au]
+V = reshape(V,8,3,[]); % [au/day]
+
+% reorder the indices
+R = permute(R,[2,3,1]); % [au]
+V = permute(V,[2,3,1]); % [au/day]
