@@ -116,7 +116,7 @@ tmp(tmp > cutoff) = cutoff;
 
 T0 = (T0 - T0(1,1))/365.25 + 2028;
 
-figure(4)
+figure(1)
 contourf(T0,TOF,tmp,'ShowText','on')
 grid on
 colormap(flipud(winter))
@@ -136,7 +136,7 @@ h.Label.Position(1) = 3;
 tmp = dV2;
 tmp(tmp > cutoff) = cutoff;
 
-figure(5)
+figure(2)
 contourf(T0,TOF,tmp,'ShowText','on')
 grid on
 colormap(flipud(winter))
@@ -156,7 +156,7 @@ h.Label.Position(1) = 3;
 tmp = dV;
 tmp(tmp > 2*cutoff) = 2*cutoff;
 
-figure(6)
+figure(3)
 contourf(T0,TOF,tmp,'ShowText','on')
 grid on
 colormap(flipud(winter))

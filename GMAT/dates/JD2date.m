@@ -26,7 +26,7 @@ if nargin < 2
 end
 
 % corresponds to the juliandate at the start of the common era
-offset = 1721027.5;
+offset = 1721058.5;
 
 % conversion
 date = datestr(JD-offset,F);

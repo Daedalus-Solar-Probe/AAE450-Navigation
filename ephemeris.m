@@ -29,12 +29,12 @@ function [R,V] = ephemeris(T_eph,useICRF)
 %
 % Revision History:
 %   Rev: IR
-%   Date: 2/2/2022
+%   Date: Feb 2, 2022
 %   Notes: Initial release, conducted limited tests compared against to the
 %       "planetEphemeris" function in ICRF for inner planets.
 %
 %   Rev: A
-%   Date: 2/5/2022
+%   Date: Feb 5, 2022
 %   Notes: Added planetary velocities and changed the shape of the output
 %       variables. Velocities slightly diverge in the z-axis of the ICRF
 %       from limited testing on the inner planets.
