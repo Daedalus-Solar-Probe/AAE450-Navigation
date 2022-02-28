@@ -10,7 +10,7 @@ clc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 bd = 3; % [1] departure body   
-ba = 5; % [1] arrival body
+ba = 2; % [1] arrival body
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Launch Window: dd-mmm-yyyy HH:MM:SS %
@@ -23,8 +23,8 @@ lw_stop = '31-Dec-2032 23:59:59'; % [UTC] launch window stop
 % Time of Flight %
 %%%%%%%%%%%%%%%%%%
 
-tof_min = 200; % [days] minimum time of flight
-tof_max = 2500; % [days] maximum time of flight
+tof_min = 50; % [days] minimum time of flight
+tof_max = 300; % [days] maximum time of flight
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Mesh size, M: Launch Window Cells, N: Time of Flight Cells %
